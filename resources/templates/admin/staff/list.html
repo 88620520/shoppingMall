@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout/admin :: html}">
+<head>
+    <title id="pageTitle">员工管理</title>
+</head>
+<body>
+    <div id="content">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+            <h1 class="h2">员工管理</h1>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStaffModal">
+                添加员工
+            </button>
+        </div>
+
+        <!-- 提示消息 -->
+        <div th:if="${success}" class="alert alert-success" role="alert">
+            <span th:text="${success}">成功信息</span>
+        </div>
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+            <span th:text="${error}">错误信息</span>
+        </div>
+
+        <!-- 员工列表 -->
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>用户名</th>
+                        <th>邮箱</th>
+                        <th>角色</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="staff : ${staffList}">
+                        <td th:text="${staff.id}">1</td>
+                        <td th:text="${staff.username}">username</td>
+                        <td th:text="${staff.email}">email</td>
+                        <td th:text="${staff.roleName}">role</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-primary" 
+                                    th:attr="onclick=|handleEdit('${staff.id}', '${staff.username}', '${staff.email}', '${staff.roleName}')|">
+                                编辑
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                    th:attr="onclick=|handleDelete('${staff.id}')|">
+                                删除
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 添加员工模态框 -->
+        <div class="modal fade" id="addStaffModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form th:action="@{/admin/staff/add}" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title">添加员工</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">用户名</label>
+                                <input type="text" class="form-control" name="username" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">密码</label>
+                                <input type="password" class="form-control" name="password" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">邮箱</label>
+                                <input type="email" class="form-control" name="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">角色</label>
+                                <select class="form-select" name="role" required>
+                                    <option value="STAFF">店销职员</option>
+                                    <option value="MANAGER">库存经理</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">添加</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 编辑员工模态框 -->
+        <div class="modal fade" id="editStaffModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="editStaffForm" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title">编辑员工</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">用户名</label>
+                                <input type="text" class="form-control" id="editUsername" disabled>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">密码</label>
+                                <input type="password" class="form-control" name="password" 
+                                       placeholder="留空表示不修改密码">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">邮箱</label>
+                                <input type="email" class="form-control" name="email" id="editEmail" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">角色</label>
+                                <select class="form-select" name="role" id="editRole" required>
+                                    <option value="STAFF">店销职员</option>
+                                    <option value="MANAGER">库存经理</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 删除确认模态框 -->
+        <div class="modal fade" id="deleteStaffModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="deleteStaffForm" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title">确认删除</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>确定要删除该员工吗？此操作不可恢复。</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-danger">删除</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 在页面底部添加脚本 -->
+        <script>
+            // 编辑员工处理函数
+            function handleEdit(id, username, email, role) {
+                document.getElementById('editUsername').value = username;
+                document.getElementById('editEmail').value = email;
+                document.getElementById('editRole').value = role;
+                document.getElementById('editStaffForm').action = `/admin/staff/${id}/update`;
+                
+                var editModal = new bootstrap.Modal(document.getElementById('editStaffModal'));
+                editModal.show();
+            }
+
+            // 删除员工处理函数
+            function handleDelete(id) {
+                document.getElementById('deleteStaffForm').action = `/admin/staff/${id}/delete`;
+                var deleteModal = new bootstrap.Modal(document.getElementById('deleteStaffModal'));
+                deleteModal.show();
+            }
+        </script>
+    </div>
+</body>
+</html> 

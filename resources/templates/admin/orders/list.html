@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout/admin :: html}">
+<head>
+    <title id="pageTitle">订单管理</title>
+</head>
+<body>
+    <div id="content">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+            <h1 class="h2">订单管理</h1>
+        </div>
+
+        <!-- 提示消息 -->
+        <div th:if="${success}" class="alert alert-success" role="alert">
+            <span th:text="${success}">成功信息</span>
+        </div>
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+            <span th:text="${error}">错误信息</span>
+        </div>
+
+        <!-- 订单列表 -->
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>订单号</th>
+                        <th>用户</th>
+                        <th>金额</th>
+                        <th>状态</th>
+                        <th>下单时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="order : ${orders}">
+                        <td th:text="${order.id}">1</td>
+                        <td th:text="${order.userId}">user</td>
+                        <td th:text="${'￥' + order.total}">￥0.00</td>
+                        <td>
+                            <span class="badge" 
+                                  th:classappend="${order.status == 'COMPLETED' ? 'bg-success' : 'bg-warning'}"
+                                  th:text="${order.status == 'COMPLETED' ? '已完成' : '处理中'}">状态</span>
+                        </td>
+                        <td th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}">2024-01-01</td>
+                        <td>
+                            <form th:action="@{/admin/orders/{id}/status(id=${order.id})}" 
+                                  method="post" style="display: inline;">
+                                <input type="hidden" name="status" value="COMPLETED">
+                                <button type="submit" class="btn btn-sm btn-success"
+                                        th:if="${order.status != 'COMPLETED'}">标记完成</button>
+                            </form>
+                            <a th:href="@{/orders/admin/{id}(id=${order.id})}"
+                               class="btn btn-sm btn-outline-primary">查看详情</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html> 

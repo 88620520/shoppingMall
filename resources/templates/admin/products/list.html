@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout/admin :: html}">
+<head>
+    <title id="pageTitle">商品管理</title>
+</head>
+<body>
+    <div id="content">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+            <h1 class="h2">商品管理</h1>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                添加商品
+            </button>
+        </div>
+
+        <!-- 提示消息 -->
+        <div th:if="${success}" class="alert alert-success" role="alert">
+            <span th:text="${success}">成功信息</span>
+        </div>
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+            <span th:text="${error}">错误信息</span>
+        </div>
+
+        <!-- 商品列表 -->
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>图片</th>
+                        <th>名称</th>
+                        <th>价格</th>
+                        <th>库存</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="product : ${products}">
+                        <td th:text="${product.id}">1</td>
+                        <td>
+                            <img th:if="${product.imageUrl}" 
+                                 th:src="${product.imageUrl}" 
+                                 alt="商品图片" 
+                                 class="img-thumbnail"
+                                 style="max-height: 50px;">
+                            <span th:unless="${product.imageUrl}" class="text-muted">无图片</span>
+                        </td>
+                        <td th:text="${product.name}">商品名称</td>
+                        <td th:text="${'￥' + product.price}">￥0.00</td>
+                        <td th:text="${product.stock}">0</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-primary" 
+                                    th:attr="onclick=|handleEdit('${product.id}', '${product.name}', '${product.description}', ${product.price}, ${product.stock}, '${product.imageUrl}')|">
+                                编辑
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                    th:attr="onclick=|handleDelete('${product.id}')|">
+                                删除
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 添加商品模态框 -->
+        <div class="modal fade" id="addProductModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form th:action="@{/admin/products/add}" method="post" enctype="multipart/form-data">
+                        <div class="modal-header">
+                            <h5 class="modal-title">添加商品</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">商品名称</label>
+                                <input type="text" class="form-control" name="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">商品描述</label>
+                                <textarea class="form-control" name="description" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">价格</label>
+                                <input type="number" class="form-control" name="price" step="0.01" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">库存</label>
+                                <input type="number" class="form-control" name="stock" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">商品图片</label>
+                                <input type="file" class="form-control" name="imageFile" accept="image/*" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">添加</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 编辑商品模态框 -->
+        <div class="modal fade" id="editProductModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="editProductForm" method="post" enctype="multipart/form-data">
+                        <div class="modal-header">
+                            <h5 class="modal-title">编辑商品</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">商品名称</label>
+                                <input type="text" class="form-control" name="name" id="editName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">商品描述</label>
+                                <textarea class="form-control" name="description" id="editDescription" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">价格</label>
+                                <input type="number" class="form-control" name="price" id="editPrice" step="0.01" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">库存</label>
+                                <input type="number" class="form-control" name="stock" id="editStock" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">商品图片</label>
+                                <input type="file" class="form-control" name="imageFile" accept="image/*">
+                                <small class="form-text text-muted">如果不上传新图片则保持原图片不变</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 删除确认模态框 -->
+        <div class="modal fade" id="deleteProductModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="deleteProductForm" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title">确认删除</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>确定要删除该商品吗？此操作不可恢复。</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-danger">删除</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页面脚本 -->
+        <script>
+            function handleEdit(id, name, description, price, stock, imageUrl) {
+                document.getElementById('editName').value = name;
+                document.getElementById('editDescription').value = description;
+                document.getElementById('editPrice').value = price;
+                document.getElementById('editStock').value = stock;
+                document.getElementById('editProductForm').action = `/admin/products/${id}/update`;
+                
+                var editModal = new bootstrap.Modal(document.getElementById('editProductModal'));
+                editModal.show();
+            }
+
+            function handleDelete(id) {
+                document.getElementById('deleteProductForm').action = `/admin/products/${id}/delete`;
+                var deleteModal = new bootstrap.Modal(document.getElementById('deleteProductModal'));
+                deleteModal.show();
+            }
+        </script>
+    </div>
+</body>
+</html> 

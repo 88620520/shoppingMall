@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: html}">
+<head>
+    <title id="pageTitle">管理收货地址</title>
+</head>
+<body>
+    <div id="content">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col">
+                    <h2>管理收货地址</h2>
+                </div>
+                <div class="col text-end">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                        <i class="bi bi-plus-circle"></i> 新增地址
+                    </button>
+                </div>
+            </div>
+
+            <!-- 地址列表 -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div th:if="${addresses.empty}" class="alert alert-info">
+                        您还没有添加任何收货地址
+                    </div>
+                    <div th:each="address : ${addresses}" class="card mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <h5 class="card-title" th:text="${address.recipientName}">收货人姓名</h5>
+                                    <p class="card-text mb-1">
+                                        <i class="bi bi-telephone"></i>
+                                        <span th:text="${address.phoneNumber}">电话号码</span>
+                                    </p>
+                                    <p class="card-text">
+                                        <i class="bi bi-geo-alt"></i>
+                                        <span th:text="${address.state + address.city + address.addressLine}">详细地址</span>
+                                        <span class="text-muted" th:text="${address.postalCode}">邮政编码</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    <form th:action="@{/addresses/{id}/delete(id=${address.id})}" 
+                                          method="post" 
+                                          onsubmit="return confirm('确定要删除这个地址吗？');">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            <i class="bi bi-trash"></i> 删除
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 新增地址模态框 -->
+        <div class="modal fade" id="addAddressModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">新增收货地址</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form th:action="@{/addresses/add}" method="post">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="recipientName" class="form-label">收货人姓名</label>
+                                <input type="text" class="form-control" id="recipientName" 
+                                       name="recipientName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="phoneNumber" class="form-label">联系电话</label>
+                                <input type="tel" class="form-control" id="phoneNumber" 
+                                       name="phoneNumber" required>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <label for="state" class="form-label">省份</label>
+                                    <input type="text" class="form-control" id="state" 
+                                           name="state" required>
+                                </div>
+                                <div class="col">
+                                    <label for="city" class="form-label">城市</label>
+                                    <input type="text" class="form-control" id="city" 
+                                           name="city" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="addressLine" class="form-label">详细地址</label>
+                                <input type="text" class="form-control" id="addressLine" 
+                                       name="addressLine" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="postalCode" class="form-label">邮政编码</label>
+                                <input type="text" class="form-control" id="postalCode" 
+                                       name="postalCode" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 编辑地址的模态框 -->
+        <div class="modal fade" id="editAddressModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">编辑收货地址</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form id="editAddressForm" method="post">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="editRecipientName" class="form-label">收货人姓名</label>
+                                <input type="text" class="form-control" id="editRecipientName" 
+                                       name="recipientName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editPhoneNumber" class="form-label">联系电话</label>
+                                <input type="tel" class="form-control" id="editPhoneNumber" 
+                                       name="phoneNumber" required>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <label for="editState" class="form-label">省份</label>
+                                    <input type="text" class="form-control" id="editState" 
+                                           name="state" required>
+                                </div>
+                                <div class="col">
+                                    <label for="editCity" class="form-label">城市</label>
+                                    <input type="text" class="form-control" id="editCity" 
+                                           name="city" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editAddressLine" class="form-label">详细地址</label>
+                                <input type="text" class="form-control" id="editAddressLine" 
+                                       name="addressLine" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editPostalCode" class="form-label">邮政编码</label>
+                                <input type="text" class="form-control" id="editPostalCode" 
+                                       name="postalCode" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">保存修改</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 更新JavaScript代码 -->
+    <script th:inline="javascript">
+        function editAddress(addressId) {
+            // 获取地址信息
+            fetch(`/addresses/${addressId}`)
+                .then(response => response.json())
+                .then(address => {
+                    // 填充表单
+                    document.getElementById('editRecipientName').value = address.recipientName;
+                    document.getElementById('editPhoneNumber').value = address.phoneNumber;
+                    document.getElementById('editState').value = address.state;
+                    document.getElementById('editCity').value = address.city;
+                    document.getElementById('editAddressLine').value = address.addressLine;
+                    document.getElementById('editPostalCode').value = address.postalCode;
+
+                    // 设置表单提交地址
+                    const form = document.getElementById('editAddressForm');
+                    form.action = `/addresses/${addressId}/update`;
+
+                    // 显示模态框
+                    new bootstrap.Modal(document.getElementById('editAddressModal')).show();
+                })
+                .catch(error => {
+                    console.error('获取地址信息失败:', error);
+                    alert('获取地址信息失败，请重试');
+                });
+        }
+
+        // 添加表单验证
+        document.getElementById('editAddressForm').addEventListener('submit', function(event) {
+            if (!this.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            this.classList.add('was-validated');
+        });
+
+        // 添加电话号码格式验证
+        const phoneInputs = document.querySelectorAll('input[type="tel"]');
+        phoneInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                this.value = this.value.replace(/[^\d]/g, '');
+                if (this.value.length > 11) {
+                    this.value = this.value.slice(0, 11);
+                }
+            });
+        });
+
+        // 添加邮政编码格式验证
+        const postalInputs = document.querySelectorAll('input[name="postalCode"]');
+        postalInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                this.value = this.value.replace(/[^\d]/g, '');
+                if (this.value.length > 6) {
+                    this.value = this.value.slice(0, 6);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

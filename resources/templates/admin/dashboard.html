@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout/admin :: html}">
+<head>
+    <title id="pageTitle">管理后台</title>
+</head>
+<body>
+    <div id="content">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+            <h1 class="h2">仪表盘</h1>
+        </div>
+
+        <div class="row">
+            <!-- Boss 和 Staff 可见 -->
+            <div class="col-md-4 mb-4" th:if="${#authorization.expression('hasAnyRole(''BOSS'', ''STAFF'')')}">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">订单统计</h5>
+                        <p class="card-text">今日订单数：<span th:text="${todayOrders}">0</span></p>
+                        <a href="/admin/orders" class="btn btn-primary">查看订单</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Boss 和 Manager 可见 -->
+            <div class="col-md-4 mb-4" th:if="${#authorization.expression('hasAnyRole(''BOSS'', ''MANAGER'')')}">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">库存预警</h5>
+                        <p class="card-text">低库存商品：<span th:text="${lowStockCount}">0</span></p>
+                        <a href="/admin/inventory" class="btn btn-primary">管理库存</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 仅 Boss 可见 -->
+            <div class="col-md-4 mb-4" th:if="${#authorization.expression('hasRole(''BOSS'')')}">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">员工管理</h5>
+                        <p class="card-text">员工总数：<span th:text="${staffCount}">0</span></p>
+                        <a href="/admin/staff" class="btn btn-primary">管理员工</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
